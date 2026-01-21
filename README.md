@@ -10,6 +10,14 @@ A web-based tool to manage OpenWrt package updates. This application allows you 
 -   **Batch Upgrades**: Select multiple packages and upgrade them in one go.
 -   **Dockerized**: Easy deployment using Docker.
 
+## Screenshots
+
+### Login Screen
+![Login Screen](screenshots/login.png)
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
 ## Docker Deployment (Recommended)
 
 The application is fully Dockerized and available on Docker Hub.
