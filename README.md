@@ -50,18 +50,57 @@ docker pull hacksmith/oum-frontend:latest
 
 ## Manual Development Setup
 
-If you want to run the application locally without Docker:
+If you prefer to run the application locally without Docker, follow these steps.
 
-### Backend
+### Prerequisites
 
-1.  Navigate to the `backend` directory.
-2.  Install dependencies: `npm install`
-3.  Start the server: `npm run dev`
-4.  The server runs on port 3001.
+-   **Node.js**: Version 18 or higher (v20 Recommended).
+-   **npm**: Included with Node.js.
+-   **SSH Access**: Access to an OpenWrt router with SSH enabled.
 
-### Frontend
+### 1. Backend Setup
 
-1.  Navigate to the `frontend` directory.
-2.  Install dependencies: `npm install`
-3.  Start the development server: `npm run dev`
-4.  Access the app at the URL provided by Vite (usually http://localhost:5173).
+The backend connects to your OpenWrt router via SSH and exposes a REST API.
+
+1.  Open a terminal and navigate to the `backend` directory:
+    ```bash
+    cd backend
+    ```
+
+2.  Install the required dependencies:
+    ```bash
+    npm install
+    ```
+
+3.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+    -   You should see: `Backend running on http://localhost:3001`
+    -   The server will automatically restart if you make changes (powered by `nodemon`).
+
+### 2. Frontend Setup
+
+The frontend is a React application built with Vite.
+
+1.  Open a **new** terminal window and navigate to the `frontend` directory:
+    ```bash
+    cd frontend
+    ```
+
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+
+3.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+    -   Vite will start the server, usually at `http://localhost:5173`.
+    -   Open this URL in your browser to use the application.
+
+### Important Notes
+
+-   Ensure the **Backend** is running before trying to log in from the Frontend.
+-   The Frontend is configured to proxy API requests to `http://localhost:3001` (ensure `vite.config.ts` or API base URL in `src/api.ts` points to the correct backend URL if you change ports).
