@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { checkUpdates, getPackages, upgradePackages } from './api';
+import { checkUpdates, getPackages } from './api';
 import { RefreshCw, Download, Check, Package as PackageIcon, LogOut } from 'lucide-react';
+import { UpdateModal } from './components/UpdateModal';
 
 interface Package {
     name: string;
@@ -17,7 +18,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     const [packages, setPackages] = useState<Package[]>([]);
     const [loading, setLoading] = useState(true);
     const [checkingUpdates, setCheckingUpdates] = useState(false);
-    const [upgrading, setUpgrading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [selectedPackages, setSelectedPackages] = useState<Set<string>>(new Set());
     const [statusMessage, setStatusMessage] = useState('');
 
@@ -78,27 +79,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         setSelectedPackages(next);
     };
 
-    const handleUpgrade = async () => {
+    const handleUpgradeClick = () => {
         if (selectedPackages.size === 0) return;
+        setShowModal(true);
+    };
 
-        if (!confirm(`Are you sure you want to upgrade ${selectedPackages.size} packages ? `)) return;
-
-        setUpgrading(true);
-        setStatusMessage('Upgrading packages... This may take a while.');
-
-        try {
-            await upgradePackages(Array.from(selectedPackages));
-            setStatusMessage('Upgrade completed successfully!');
-            setSelectedPackages(new Set());
-            // Reload packages to reflect changes
-            await loadPackages();
-            // Clear newVersion flags for upgraded packages (naive approach, reloading is better)
-        } catch (error) {
-            console.error(error);
-            setStatusMessage('Upgrade failed.');
-        } finally {
-            setUpgrading(false);
-        }
+    const handleUpgradeSuccess = async () => {
+        setStatusMessage('Upgrade completed successfully!');
+        setSelectedPackages(new Set());
+        setShowModal(false);
+        await loadPackages();
     };
 
     const upgradablePackages = packages.filter(p => p.newVersion);
@@ -124,7 +114,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                         <LogOut size={18} />
                         Log Out
                     </button>
-                    <button className="btn" onClick={handleCheckUpdates} disabled={checkingUpdates || upgrading} style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+                    <button className="btn" onClick={handleCheckUpdates} disabled={checkingUpdates} style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
                         <RefreshCw size={18} className={checkingUpdates ? 'spin' : ''} />
                         {checkingUpdates ? 'Checking...' : 'Check Updates'}
                     </button>
@@ -134,9 +124,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                                 <Check size={18} />
                                 {showUpdatesOnly ? 'Show All' : 'Show Updates Only'}
                             </button>
-                            <button className="btn" onClick={handleUpgrade} disabled={selectedPackages.size === 0 || upgrading}>
+                            <button className="btn" onClick={handleUpgradeClick} disabled={selectedPackages.size === 0}>
                                 <Download size={18} />
-                                {upgrading ? 'Upgrading...' : `Update Selected(${selectedPackages.size})`}
+                                {`Update Selected(${selectedPackages.size})`}
                             </button>
                         </>
                     )}
@@ -198,6 +188,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     to { transform: rotate(360deg); }
 }
 `}</style>
+            {showModal && (
+                <UpdateModal
+                    packages={Array.from(selectedPackages)}
+                    onClose={() => setShowModal(false)}
+                    onSuccess={handleUpgradeSuccess}
+                />
+            )}
         </div>
     );
 };

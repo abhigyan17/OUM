@@ -5,7 +5,7 @@ services:
   # FRONTEND SERVICE (The Website)
   # -------------------------------------------------------
   frontend:
-    build: ./frontend
+    image: hacksmith/oum-frontend:latest
     container_name: oum-frontend
     restart: always
     ports:
@@ -22,7 +22,7 @@ services:
   # BACKEND SERVICE (The API)
   # -------------------------------------------------------
   backend:
-    build: ./backend
+    image: hacksmith/oum-backend:latest
     container_name: oum-backend
     restart: always
     ports:

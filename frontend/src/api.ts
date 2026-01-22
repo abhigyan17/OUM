@@ -46,3 +46,49 @@ export const checkUpdates = async () => {
 export const upgradePackages = async (packages: string[]) => {
     return api.post('/upgrade', { packages });
 };
+
+export const getPackageInfo = async (packages: string[]) => {
+    return api.post('/package-info', { packages });
+};
+
+export const streamUpgradePackages = async (
+    packages: string[],
+    options: { forceOverwrite: boolean; installTranslations: boolean },
+    onMessage: (msg: any) => void
+) => {
+    const response = await fetch(`${API_BASE_URL}/upgrade`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-ssh-host': api.defaults.headers['x-ssh-host'] as string || '',
+            'x-ssh-username': api.defaults.headers['x-ssh-username'] as string || '',
+            'x-ssh-password': api.defaults.headers['x-ssh-password'] as string || '',
+        },
+        body: JSON.stringify({ packages, ...options }),
+    });
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+
+    if (reader) {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n\n');
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const data = line.substring(6);
+                    try {
+                        onMessage(JSON.parse(data));
+                    } catch (e) {
+                        // ignore non-json or partial data
+                        if (data.trim() === 'Upgrade finished') {
+                            onMessage({ type: 'done' });
+                        }
+                    }
+                }
+            }
+        }
+    }
+};

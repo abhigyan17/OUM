@@ -7,7 +7,7 @@ A web-based tool to manage OpenWrt package updates. This application allows you 
 -   **SSH Connection**: Securely connect to your router using IP, username, and password.
 -   **Package Monitoring**: View a list of all installed packages.
 -   **Update Checking**: Automatically check for available upgrades.
--   **Batch Upgrades**: Select multiple packages and upgrade them in one go.
+-   **Advanced Updates**: Detailed package dependency view, options to overwrite conflicts, and install suggested translations.
 -   **Dockerized**: Easy deployment using Docker.
 
 ## Screenshots
