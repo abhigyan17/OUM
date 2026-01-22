@@ -70,15 +70,29 @@ export const streamUpgradePackages = async (
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();
 
+    // Buffer to handle partial chunks
+    let buffer = '';
+
     if (reader) {
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            const chunk = decoder.decode(value);
-            const lines = chunk.split('\n\n');
+
+            // Append new chunk to buffer
+            buffer += decoder.decode(value, { stream: true });
+
+            // Split by lines
+            const lines = buffer.split('\n\n');
+
+            // The last part might be incomplete, keep it in buffer
+            // If the buffer ended with \n\n, lines will contain an empty string at the end.
+            // But pop() removes the last element. If it was empty, buffer becomes empty.
+            // If it was partial 'data: foo', buffer becomes 'data: foo'.
+            buffer = lines.pop() || '';
+
             for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    const data = line.substring(6);
+                if (line.trim().startsWith('data: ')) {
+                    const data = line.trim().substring(6);
                     try {
                         onMessage(JSON.parse(data));
                     } catch (e) {
