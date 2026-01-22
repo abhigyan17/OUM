@@ -1,18 +1,56 @@
 version: '3.8'
 
 services:
-  backend:
-    build: ./backend
-    image: hacksmith/oum-backend:latest
-    ports:
-      - "3001:3001"
-    restart: always
-
+  # -------------------------------------------------------
+  # FRONTEND SERVICE (The Website)
+  # -------------------------------------------------------
   frontend:
     build: ./frontend
-    image: hacksmith/oum-frontend:latest
-    ports:
-      - "8080:80"
+    container_name: oum-frontend
     restart: always
+    ports:
+      # CHANGED: Host Port 8833 maps to Container Port 80
+      # You will access the site at http://your-ip:8833
+      - "8833:80"
+      # The frontend still needs to find the backend on port 3300.
+      # IMPORTANT: If accessing from another device, ensure port 3300 is open.
+      # API URL is now dynamically determined by the frontend to match the host IP.
     depends_on:
       - backend
+
+  # -------------------------------------------------------
+  # BACKEND SERVICE (The API)
+  # -------------------------------------------------------
+  backend:
+    build: ./backend
+    container_name: oum-backend
+    restart: always
+    ports:
+      # Backend listens on 3001 inside the container (per Dockerfile and source)
+      # Host port 3300 maps to container port 3001
+      - "3300:3001"
+    environment:
+      - DB_USER=oum_user
+      - DB_PASSWORD=SecretPassword123!
+      - DB_NAME=oum_db
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      - db
+
+  # -------------------------------------------------------
+  # DATABASE SERVICE
+  # -------------------------------------------------------
+  db:
+    image: postgres:13
+    container_name: oum-db
+    restart: always
+    environment:
+      POSTGRES_USER: oum_user
+      POSTGRES_PASSWORD: SecretPassword123!
+      POSTGRES_DB: oum_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

@@ -36,8 +36,8 @@ The application is fully Dockerized and available on Docker Hub.
     ```
 
 3.  Access the application:
-    -   **Frontend**: [http://localhost:8080](http://localhost:8080)
-    -   **Backend**: [http://localhost:3001](http://localhost:3001)
+    -   **Frontend**: [http://localhost:8833](http://localhost:8833) (or `http://<YOUR_LAN_IP>:8833` from other devices)
+    -   **Backend**: Internal port 3300 (dynamically accessed by frontend)
 
 ### Using Docker Hub Images Directly
 
