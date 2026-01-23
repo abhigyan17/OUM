@@ -18,6 +18,9 @@ A web-based tool to manage OpenWrt package updates. This application allows you 
 ### Dashboard
 ![Dashboard](screenshots/dashboard.png)
 
+### Demo
+![Login Demo](screenshots/demo.webp)
+
 ## Docker Deployment (Recommended)
 
 The application is fully Dockerized and available on Docker Hub.

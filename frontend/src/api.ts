@@ -56,13 +56,16 @@ export const streamUpgradePackages = async (
     options: { forceOverwrite: boolean; installTranslations: boolean },
     onMessage: (msg: any) => void
 ) => {
+    const credentialsStr = localStorage.getItem('ssh_credentials');
+    const credentials = credentialsStr ? JSON.parse(credentialsStr) : {};
+
     const response = await fetch(`${API_BASE_URL}/upgrade`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-ssh-host': api.defaults.headers['x-ssh-host'] as string || '',
-            'x-ssh-username': api.defaults.headers['x-ssh-username'] as string || '',
-            'x-ssh-password': api.defaults.headers['x-ssh-password'] as string || '',
+            'x-ssh-host': credentials.host || '',
+            'x-ssh-username': credentials.username || '',
+            'x-ssh-password': credentials.password || '',
         },
         body: JSON.stringify({ packages, ...options }),
     });
